@@ -33,34 +33,36 @@ class HomeViewModel: ObservableObject {
     
     func addSubscribers() {
         // updates allCoins
-        $searchText
-            .combineLatest(coinDataService.$allCoins, $sortOption)
-            .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
-            .map(filterAndSortCoins)
-            .sink { [weak self] returnedCoins in
-                self?.allCoins = returnedCoins
+        Task {
+            for await value in $searchText.combineLatest(coinDataService.$allCoins, $sortOption)
+                .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main).values {
+                let returnedCoins = filterAndSortCoins(text: value.0, coins: value.1, sort: value.2)
+                await MainActor.run(body: {
+                    self.allCoins = returnedCoins
+                })
             }
-            .store(in: &cancellables)
+        }
                 
         // updates portfolioCoins
-        $allCoins
-            .combineLatest(portfolioDataService.$savedEntities)
-            .map(mapAllCoinsToPortfolioCoins)
-            .sink { [weak self] returnedCoins in
-                guard let self = self else { return }
-                self.portfolioCoins = self.sortPortfolioCoinsIfNeeded(coins: returnedCoins)
+        Task {
+            for await value in $allCoins.combineLatest(portfolioDataService.$savedEntities).values {
+                let returnedCoins = mapAllCoinsToPortfolioCoins(allCoins: value.0, portfolioEntities: value.1)
+                await MainActor.run(body: {
+                    self.portfolioCoins = self.sortPortfolioCoinsIfNeeded(coins: returnedCoins)
+                })
             }
-            .store(in: &cancellables)
+        }
         
         // updates marketData
-        marketDataService.$marketData
-            .combineLatest($portfolioCoins)
-            .map(mapGlobalMarketData)
-            .sink { [weak self] returnedStats in
-                self?.statistics = returnedStats
-                self?.isLoading = false
+        Task {
+            for await value in marketDataService.$marketData.combineLatest($portfolioCoins).values {
+                let stats = mapGlobalMarketData(marketData: value.0, portfolioCoins: value.1)
+                await MainActor.run(body: {
+                    self.statistics = stats
+                    self.isLoading = false
+                })
             }
-            .store(in: &cancellables)
+        }
     }
     
     func updatePortfolio(coin: CoinModel, amount: Double) {

@@ -21,19 +21,9 @@ class MarketDataService {
             guard let url = URL(string: "https://api.coingecko.com/api/v3/global") else { return }
             
             if let data = try? await NetworkingManager.download(url: url) {
-                self.marketData = try JSONDecoder().decode(MarketDataModel.self, from: data)
+                let globalData = try JSONDecoder().decode(GlobalData.self, from: data)
+                self.marketData = globalData.data
             }
-            
-    //        marketDataSubscription = NetworkingManager.download(url: url)
-    //            .decode(type: GlobalData.self, decoder: JSONDecoder())
-    //            .receive(on: DispatchQueue.main)
-    //            .sink(
-    //                receiveCompletion: NetworkingManager.handleCompletion,
-    //                receiveValue: { [weak self] returnedGlobalData in
-    //                    self?.marketData = returnedGlobalData.data
-    //                    self?.marketDataSubscription?.cancel()
-    //            })
-
         }
     }
 
