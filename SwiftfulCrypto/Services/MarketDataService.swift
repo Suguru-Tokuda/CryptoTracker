@@ -17,17 +17,24 @@ class MarketDataService {
     }
 
     func getCoins() {
-        guard let url = URL(string: "https://api.coingecko.com/api/v3/global") else { return }
-        
-        marketDataSubscription = NetworkingManager.download(url: url)
-            .decode(type: GlobalData.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
-            .sink(
-                receiveCompletion: NetworkingManager.handleCompletion,
-                receiveValue: { [weak self] returnedGlobalData in
-                    self?.marketData = returnedGlobalData.data
-                    self?.marketDataSubscription?.cancel()
-            })
+        Task {
+            guard let url = URL(string: "https://api.coingecko.com/api/v3/global") else { return }
+            
+            if let data = try? await NetworkingManager.download(url: url) {
+                self.marketData = try JSONDecoder().decode(MarketDataModel.self, from: data)
+            }
+            
+    //        marketDataSubscription = NetworkingManager.download(url: url)
+    //            .decode(type: GlobalData.self, decoder: JSONDecoder())
+    //            .receive(on: DispatchQueue.main)
+    //            .sink(
+    //                receiveCompletion: NetworkingManager.handleCompletion,
+    //                receiveValue: { [weak self] returnedGlobalData in
+    //                    self?.marketData = returnedGlobalData.data
+    //                    self?.marketDataSubscription?.cancel()
+    //            })
+
+        }
     }
 
 }

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 class NetworkingManager {
     enum NetworkingError: LocalizedError {
@@ -21,27 +20,22 @@ class NetworkingManager {
         }
     }
     
-    static func download(url: URL) -> AnyPublisher<Data, Error> {
-        return URLSession.shared.dataTaskPublisher(for: url)
-            .tryMap({ try handleURLResponse(output: $0, url: url) })
-            .retry(3)
-            .eraseToAnyPublisher()
+    static func download(url: URL) async throws -> Data? {
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            return handleURLResponse(data: data, response: response)
+        } catch {
+            throw error
+        }
     }
     
-    static func handleURLResponse(output: URLSession.DataTaskPublisher.Output, url: URL) throws -> Data {
-        guard let response = output.response as? HTTPURLResponse,
-              response.statusCode >= 200 && response.statusCode < 300 else {
-            throw NetworkingError.badURLResponse(url: url)
-        }
-        return output.data
-    }
-        
-    static func handleCompletion(completion: Subscribers.Completion<Error>) {
-        switch completion {
-        case .finished:
-            break;
-        case .failure(let error):
-            print(error.localizedDescription)
-        }
+    static func handleURLResponse(data: Data?, response: URLResponse?) -> Data? {
+        guard
+            let data = data,
+            let response = response as? HTTPURLResponse,
+            response.statusCode >= 200 && response.statusCode < 300 else {
+                return nil
+            }
+        return data
     }
 }
