@@ -24,12 +24,13 @@ class CoinImageViewModel: ObservableObject {
     }
     
     private func addSubscribers() {
-        dataService.$image
-            .sink(receiveCompletion: { [weak self] _ in
-                self?.isLoading = false
-            }, receiveValue: { [weak self] returnedImage in
-                self?.image = returnedImage
-            })
-            .store(in: &cancellables)
+        Task {
+            for await value in dataService.$image.values {
+                await MainActor.run(body: {
+                    self.isLoading = false
+                    self.image = value
+                })
+            }
+        }
     }
 }

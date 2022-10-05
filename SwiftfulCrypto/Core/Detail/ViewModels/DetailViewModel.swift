@@ -26,22 +26,27 @@ class DetailViewModel: ObservableObject {
     }
     
     private func addSubscribers() {
-        coinDetailService.$coinDetails
-            .combineLatest($coin)
-            .map(mapDataToStatistics)
-            .sink { [weak self] returnedArrays in
-                self?.overviewStatistics = returnedArrays.overview
-                self?.additionalStatistics = returnedArrays.additional
+        Task {
+            for await value in coinDetailService.$coinDetails.values {
+                await MainActor.run(body: {
+                    let returnedArrays = mapDataToStatistics(coinDetailModel: value, coinModel: self.coin)
+                    self.overviewStatistics = returnedArrays.overview
+                    self.additionalStatistics = returnedArrays.additional
+                })
             }
-            .store(in: &cancellables)
+        }
         
-        coinDetailService.$coinDetails
-            .sink { [weak self] returnedCoinDetails in
-                self?.coinDescription = returnedCoinDetails?.readableDescription
-                self?.websiteURL = returnedCoinDetails?.links?.homepage?.first
-                self?.redditURL = returnedCoinDetails?.links?.subredditURL
+        Task {
+            for await value in coinDetailService.$coinDetails.values {
+                await MainActor.run(body: {
+                    if let value = value {
+                        self.coinDescription = value.readableDescription
+                        self.websiteURL = value.links?.homepage?.first
+                        self.redditURL = value.links?.subredditURL
+                    }
+                })
             }
-            .store(in: &cancellables)
+        }
     }
     
     func reloadData() {
