@@ -70,6 +70,7 @@ struct DetailView_Previews: PreviewProvider {
         NavigationView {
             DetailView(coin: dev.coin)
         }
+        .preferredColorScheme(.dark)
     }
 }
 

@@ -13,7 +13,7 @@ struct PortfolioView: View {
     @State private var quantityText: String = ""
     @State private var animateSelectedCoin: Bool = false
     @State private var showCheckmark: Bool = false
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         NavigationView {
@@ -36,7 +36,7 @@ struct PortfolioView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     XMarkButton()
                         .onTapGesture {
-                            presentationMode.wrappedValue.dismiss()
+                            dismiss()
                         }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {

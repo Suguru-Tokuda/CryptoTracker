@@ -7,11 +7,9 @@
 
 import Foundation
 import SwiftUI
-import Combine
 
 class CoinImageService {
     @Published var image: UIImage?
-    var imageSubscription: AnyCancellable?
     private let coin: CoinModel
     private let fileManager = LocalFileManager.instance
     private let folderName = "coin_images"

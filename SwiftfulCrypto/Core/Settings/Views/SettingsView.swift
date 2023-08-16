@@ -15,7 +15,7 @@ struct SettingsView: View {
     let personalURL = URL(string: "https://github.com/Suguru-Tokuda")!
     let dogTeamDobermanURL = URL(string: "https://dogteamdobermans.com")!
 
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         NavigationView {
@@ -45,7 +45,7 @@ struct SettingsView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     XMarkButton()
                         .onTapGesture {
-                            presentationMode.wrappedValue.dismiss()
+                            dismiss()
                         }
                 }
             }

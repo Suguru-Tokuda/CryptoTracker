@@ -165,13 +165,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		BB0C166028E7D17700FBA7C4 /* New Group */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "New Group";
-			sourceTree = "<group>";
-		};
 		BB292C0028E293B5003F03E0 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -224,7 +217,6 @@
 			isa = PBXGroup;
 			children = (
 				BB5DFD1C28E2448A008C0F22 /* SwiftfulCryptoApp.swift */,
-				BB0C166028E7D17700FBA7C4 /* New Group */,
 				BB5DFD2028E2448B008C0F22 /* Assets.xcassets */,
 				BB5DFD2D28E24908008C0F22 /* Core */,
 				BB5DFD2A28E24712008C0F22 /* Extensions */,
@@ -302,9 +294,9 @@
 			isa = PBXGroup;
 			children = (
 				BB0C162828E4AC3F00FBA7C4 /* SearchBarView.swift */,
-				BB46A07E28E3DB5E0070E59E /* CoinImage */,
-				BB5DFD3528E249FE008C0F22 /* CircleButton */,
 				BB0C162E28E4B8A200FBA7C4 /* StatisticView.swift */,
+				BB5DFD3528E249FE008C0F22 /* CircleButton */,
+				BB46A07E28E3DB5E0070E59E /* CoinImage */,
 			);
 			path = Components;
 			sourceTree = "<group>";
